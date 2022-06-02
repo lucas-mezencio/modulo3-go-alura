@@ -13,7 +13,7 @@ type Produto struct {
 func BuscaTodosOsProdutos() []Produto {
 	dababase := db.ConnectWithDB()
 
-	selectTodosProdutos, err := dababase.Query("select * from produtos")
+	selectTodosProdutos, err := dababase.Query("select * from produtos order by id asc")
 	if err != nil {
 		panic(err.Error())
 	}
@@ -63,5 +63,44 @@ func DeletaProduto(id string) {
 	}
 	scriptDelecao.Exec(id)
 
+	defer database.Close()
+}
+
+func EditaProduto(id string) Produto {
+	database := db.ConnectWithDB()
+
+	produtoOriginal, err := database.Query("select * from produtos where id=$1", id)
+	if err != nil {
+		panic(err.Error())
+	}
+	produtoAtualizado := Produto{}
+
+	for produtoOriginal.Next() {
+		var id, quantidade int
+		var nome, descricao string
+		var preco float64
+
+		err = produtoOriginal.Scan(&id, &nome, &descricao, &preco, &quantidade)
+		if err != nil {
+			panic(err.Error())
+		}
+
+		produtoAtualizado.Id = id
+		produtoAtualizado.Nome = nome
+		produtoAtualizado.Descricao = descricao
+		produtoAtualizado.Preco = preco
+		produtoAtualizado.Quantidade = quantidade
+	}
+	defer database.Close()
+	return produtoAtualizado
+}
+
+func AtualizaProduto(id int, nome, descricao string, preco float64, quantidade int) {
+	database := db.ConnectWithDB()
+	produto, err := database.Prepare("update produtos set nome=$1, descricao=$2, preco=$3, quantidade=$4 where id=$5")
+	if err != nil {
+		panic(err.Error())
+	}
+	produto.Exec(nome, descricao, preco, quantidade, id)
 	defer database.Close()
 }
