@@ -30,18 +30,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>Camiseta</td>
-                    <td>Bem bonita</td>
-                    <td>29</td>
-                    <td>10</td>
-                </tr>
                 {{range .}}
                 <tr>
                     <td>{{.Nome}}</td>
                     <td>{{.Descricao}}</td>
                     <td>{{.Preco}}</td>
                     <td>{{.Quantidade}}</td>
+                    <td><a href="/delete?id={{.Id}}" class="btn btn-danger">Deletar</a></td>
                 </tr>
                 {{end}}
                 </tbody>

@@ -53,3 +53,15 @@ func CriarProduto(nome, descricao string, preco float64, quantidade int) {
 	scriptInsercao.Exec(nome, descricao, preco, quantidade)
 	defer database.Close()
 }
+
+func DeletaProduto(id string) {
+	database := db.ConnectWithDB()
+
+	scriptDelecao, err := database.Prepare("delete from produtos where id = $1")
+	if err != nil {
+		panic(err.Error())
+	}
+	scriptDelecao.Exec(id)
+
+	defer database.Close()
+}
